@@ -32,13 +32,16 @@ SUITS = {"wands": "Wands", "cups": "Cups", "swords": "Swords", "pents": "Pents"}
 
 
 def fetch(name: str) -> bytes | None:
-    try:
-        r = requests.get(BASE + name + ".jpg", timeout=40,
-                         headers={"User-Agent": "astrbot-tarot/1.0"})
-        if r.status_code == 200 and len(r.content) > 5000:
-            return r.content
-    except Exception as exc:  # noqa: BLE001
-        print("  失败", name, type(exc).__name__)
+    """先按系统代理试，走不通再直连。有的机器只有其中一个能出去。"""
+    url = BASE + name + ".jpg"
+    headers = {"User-Agent": "astrbot-tarot/1.0"}
+    for attempt, proxies in (("系统代理", None), ("直连", {})):
+        try:
+            r = requests.get(url, timeout=40, headers=headers, proxies=proxies)
+            if r.status_code == 200 and len(r.content) > 5000:
+                return r.content
+        except Exception as exc:  # noqa: BLE001
+            print(f"  {attempt}失败", name, type(exc).__name__)
     return None
 
 
