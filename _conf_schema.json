@@ -1,0 +1,133 @@
+{
+  "card_enabled": {
+    "type": "bool",
+    "description": "发送图片卡片",
+    "default": true,
+    "hint": "关掉后只回文字牌义。出图失败会自动退回文字，不会不回话。"
+  },
+  "card_width": {
+    "type": "int",
+    "description": "卡片宽度（像素）",
+    "default": 900,
+    "hint": "640～1400。窄一点在手机上看着更舒服，宽一点细节更清楚。"
+  },
+  "card_art": {
+    "type": "bool",
+    "description": "牌面画韦特牌图",
+    "default": false,
+    "hint": "关着是中式字面牌（朱框、竖排牌名、朱印）；打开换成韦特牌图。"
+  },
+  "font_style": {
+    "type": "string",
+    "description": "牌名字体",
+    "default": "舒体",
+    "hint": "舒体 / 行楷 / 楷体 / 隶书 / 姚体 / 中宋 / 新魏 / 仿宋。罗马数字固定用宋体，不跟着换。"
+  },
+  "font_style_small": {
+    "type": "string",
+    "description": "牌阵里小牌的牌名字体",
+    "default": "楷体",
+    "hint": "多张牌阵（含十字、凯尔特）的牌名和位置标签用这套。舒体在 20 像素左右会糊，默认楷体。"
+  },
+  "reversed_enabled": {
+    "type": "bool",
+    "description": "启用逆位",
+    "default": true,
+    "hint": "关掉后只出正位，适合不想被逆位吓到的人。"
+  },
+  "reversed_percent": {
+    "type": "int",
+    "description": "逆位出现的概率（%）",
+    "default": 35,
+    "hint": "0～100。真实占卜里逆位没有一半那么多，默认 35。"
+  },
+  "three_card_enabled": {
+    "type": "bool",
+    "description": "允许多张牌阵",
+    "default": true,
+    "hint": "关掉后只能用单张，多张牌阵会自动降级成单张。"
+  },
+  "default_spread": {
+    "type": "string",
+    "description": "不指定牌阵时用哪个",
+    "default": "时间",
+    "hint": "可填 一张 / 时间 / 行动 / 关系 / 十字 / 凯尔特 / 二选一，填错按三张的时间流处理。不指定就抽三张，过去、现在、未来。"
+  },
+  "include_question": {
+    "type": "bool",
+    "description": "把问题印在卡片上",
+    "default": true,
+    "hint": "问题最多取 24 字，避免卡片被撑变形。"
+  },
+  "manual_draw": {
+    "type": "bool",
+    "description": "抽牌要先报数字",
+    "default": true,
+    "hint": "开着：洗完牌让对方从 1 到 78 里报数字，报完才出图。关掉：直接出图，不用报。"
+  },
+  "manual_timeout_seconds": {
+    "type": "int",
+    "description": "手动抽牌等报数字的时限（秒）",
+    "default": 180,
+    "hint": "30～900。超时这局就作废，免得第二天报个数字还出一张牌。"
+  },
+  "question_lock_hours": {
+    "type": "int",
+    "description": "同一个问题多少小时内只让抽一次",
+    "default": 12,
+    "hint": "0 表示不拦。拦的时候会告诉他上次什么时候抽的、头一张是什么牌。只差标点算同一个问题。"
+  },
+  "reading_text": {
+    "type": "bool",
+    "description": "发完牌阵图再补一段解读",
+    "default": true,
+    "hint": "解读按「位置含义 + 牌义」串起来，最后给一句整体判断。"
+  },
+  "llm_reading": {
+    "type": "bool",
+    "description": "让模型写解读",
+    "default": false,
+    "hint": "开后会调用当前使用的模型写 4～6 句，费 token；模型不可用时自动退回固定文案。"
+  },
+  "llm_max_chars": {
+    "type": "int",
+    "description": "模型解读最多几个字",
+    "default": 100,
+    "hint": "40～400。超了按句号截断。开着模型时也只让它补两三句，逐张牌那段仍由固定文案给。"
+  },
+  "llm_timeout_seconds": {
+    "type": "int",
+    "description": "模型解读超时（秒）",
+    "default": 25,
+    "hint": "超过这个时间还没写完就退回固定文案，不会一直等。"
+  },
+  "shuffle_notice": {
+    "type": "bool",
+    "description": "抽牌前先回一句「洗牌中」",
+    "default": true,
+    "hint": "关掉就直接发图，少一条消息。"
+  },
+  "footer_text": {
+    "type": "string",
+    "description": "卡片底部的小字",
+    "default": "",
+    "hint": "留空则显示当天日期。"
+  },
+  "cooldown_seconds": {
+    "type": "int",
+    "description": "同一用户的冷却时间（秒）",
+    "default": 5,
+    "hint": "0 表示不限。"
+  },
+  "group_cooldown_seconds": {
+    "type": "int",
+    "description": "同一个群的冷却时间（秒）",
+    "default": 10,
+    "hint": "0 表示不限。只按人限流的话，十个人轮流抽，群里照样刷屏。"
+  },
+  "allow_user_ids": {
+    "type": "list",
+    "description": "允许使用的 QQ 号（留空=所有人）",
+    "default": []
+  }
+}
