@@ -380,7 +380,15 @@ def compose_reading(items: list[tuple], question: str = "",
     groups 是 [(组名, 起始下标, 结束下标)]，给了就在组之间空一行。
     """
     lines = []
+    many = len(items) >= 5
+
     for idx, (card, rev, pos, mean) in enumerate(items):
+        if many:
+            # 五张以上不再逐张铺牌义，只留位置和牌名，正文靠后面的关系和结论
+            if idx == 0:
+                lines.append("牌面：" + "，".join(
+                    f"{p} {c['name_cn']}{'逆' if r else '正'}" for c, r, p, _ in items))
+            continue
         if groups and idx and any(g[1] == idx for g in groups):
             lines.append("")
         pos_txt = "逆位" if rev else "正位"
