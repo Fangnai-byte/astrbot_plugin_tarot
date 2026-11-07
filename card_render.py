@@ -636,13 +636,14 @@ def render_cross(items: list, out_path: str, title: str,
     d = ImageDraw.Draw(img, "RGBA")
     ly = H - list_h - int(W * 0.060)
     marks = "①②③④⑤⑥"
-    parts = []
     for i, (card, rev, pos, mean) in enumerate(items):
         state = "逆" if rev else "正"
-        parts.append(f"{marks[i]}{card['name_cn']}{state}")
-    line = "  ".join(parts)
-    _ink(d, (int(W * 0.06), ly), line, f_list, INK)
-    ly += int(W * 0.040)
+        num = f" · {card['roman']}" if card.get("roman") else ""
+        line = f"{marks[i]} {pos}：{card['name_cn']}{num}（{state}）— {mean}"
+        if len(line) > 42:
+            line = line[:42] + "…"
+        _ink(d, (int(W * 0.06), ly), line, f_list, INK)
+        ly += int(W * 0.036)
 
     if question:
         q = "问：" + (question if len(question) <= 26 else question[:26] + "…")
@@ -763,13 +764,14 @@ def render_celtic(items: list, out_path: str, title: str,
     # 牌义列表
     ly = H - list_h - int(W * 0.050)
     marks = "①②③④⑤⑥⑦⑧⑨⑩"
-    parts = []
     for i, (card, rev, pos, mean) in enumerate(items):
         state = "逆" if rev else "正"
-        parts.append(f"{marks[i]}{card['name_cn']}{state}")
-    line = "  ".join(parts)
-    _ink(d, (int(W * 0.06), ly), line, f_list, INK)
-    ly += int(W * 0.040)
+        num = f" · {card['roman']}" if card.get("roman") else ""
+        line = f"{marks[i]} {pos}：{card['name_cn']}{num}（{state}）— {mean}"
+        if len(line) > 46:
+            line = line[:46] + "…"
+        _ink(d, (int(W * 0.06), ly), line, f_list, INK)
+        ly += int(W * 0.036)
 
     if question:
         q = "问：" + (question if len(question) <= 26 else question[:26] + "…")
