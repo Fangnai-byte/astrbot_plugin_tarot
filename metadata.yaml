@@ -1,0 +1,44 @@
+# 插件的唯一标识名 (不要改)
+name: astrbot_plugin_tarot
+
+# 插件展示名
+display_name: Tarot (塔罗占卜)
+
+# 插件的一句话简介
+desc: 按牌阵抽塔罗牌：单张到十张凯尔特十字，每个位置有含义，发纸质风格的牌阵图并附一段解读；78 张全牌组，牌面可选中式字面或 1909 年版韦特牌图（公有领域）
+
+# 插件的详细帮助信息
+help: |
+  /塔罗 [问题]           抽一局，用默认牌阵
+  /塔罗 十字 [问题]      指定牌阵，七个牌阵从单张到凯尔特十字十张
+  /塔罗 牌阵             列出所有牌阵与位置
+  /塔罗 回看             翻上一局，牌不会变
+  /塔罗 统计             看最近抽过什么
+  /塔罗 牌 月亮          查一张牌，出卡片图
+  /塔罗 帮助             命令说明
+
+  卡片用 Pillow 本地绘制，不联网、不依赖浏览器；出图失败会自动退回文字。
+
+# (可选) 插件 Logo 文件名（对应插件目录下的 logo.png）
+# 使用 GitHub 绝对链接，避免 Cloud 构建时资源不同步
+logo: "https://raw.githubusercontent.com/Fangnai-byte/astrbot_plugin_tarot/main/logo.png"
+
+# (可选) 你的 GitHub 仓库地址
+repo: "https://github.com/Fangnai-byte/astrbot_plugin_tarot"
+
+# 插件版本号
+version: 1.0.0
+
+# 作者名
+author: Fangnai-byte
+
+# 声明支持的平台
+support_platforms:
+  - aiocqhttp
+  - telegram
+  - discord
+  - lark
+  - wecom
+
+# 声明支持的 AstrBot 版本范围
+astrbot_version: ">=v4.12.0"
