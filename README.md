@@ -141,6 +141,18 @@
 把 `astrbot_plugin_tarot` 整个目录放进 `data/plugins/`，面板里启用。没有额外依赖，AstrBot 自带的 Pillow 就够。
 出图失败会退回文字，不会不回话。
 
+### 牌图（可选）
+
+仓库里不带牌图，`art/` 默认是空的，牌面走纯文字那套。想要韦特牌图：
+
+```bash
+cd data/plugins/astrbot_plugin_tarot
+python tools_fetch_art.py      # 从 Wikimedia 下 1909 年版，约 4 MB
+```
+
+下完把 `card_art` 打开。脚本会自己裁成 3:5、压成 300×500，重复跑只补缺的那几张。
+没网、下不动也没关系，牌面自动退回文字，不影响抽牌。
+
 ## 变更记录
 
 **1.0.0**
