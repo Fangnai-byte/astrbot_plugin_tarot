@@ -511,6 +511,21 @@ def _star4(d, cx: float, cy: float, r: float, color, inner: float = 0.34) -> Non
     d.polygon(pts, fill=color)
 
 
+_RANK_SHORT = {"侍从": "侍", "骑士": "骑", "皇后": "后", "国王": "王"}
+
+
+def _card_tag(card: dict) -> str:
+    """左上角那个标记：大牌用罗马数字，小牌用点数或位阶。"""
+    if card.get("roman"):
+        return card["roman"]
+    name = card.get("name_cn") or ""
+    suit = card.get("suit") or ""
+    rank = name[len(suit):] if suit and name.startswith(suit) else name
+    if not rank:
+        return suit
+    return _RANK_SHORT.get(rank, rank)
+
+
 def _cn_face(card: dict, rev: bool, w: int, h: int) -> Image.Image:
     """没有牌图时的牌面：纸、墨线、居中的字。不套任何装饰。"""
     tile = Image.new("RGBA", (w, h), (0, 0, 0, 0))
@@ -519,7 +534,7 @@ def _cn_face(card: dict, rev: bool, w: int, h: int) -> Image.Image:
     d = ImageDraw.Draw(tile, "RGBA")
 
     name = card["name_cn"]
-    tag = card.get("roman") or card.get("suit") or ""
+    tag = _card_tag(card)
     small = w < 190
 
     if small:
@@ -631,7 +646,8 @@ def render_cross(items: list, out_path: str, title: str,
     marks = "①②③④⑤⑥"
     for i, (card, rev, pos, mean) in enumerate(items):
         state = "逆" if rev else "正"
-        line = f"{marks[i]} {pos}：{card['name_cn']}（{state}）— {mean}"
+        num = f" · {card['roman']}" if card.get("roman") else ""
+        line = f"{marks[i]} {pos}：{card['name_cn']}{num}（{state}）— {mean}"
         if len(line) > 42:
             line = line[:42] + "…"
         _ink(d, (int(W * 0.06), ly), line, f_list, INK)
@@ -758,7 +774,8 @@ def render_celtic(items: list, out_path: str, title: str,
     marks = "①②③④⑤⑥⑦⑧⑨⑩"
     for i, (card, rev, pos, mean) in enumerate(items):
         state = "逆" if rev else "正"
-        line = f"{marks[i]} {pos}：{card['name_cn']}（{state}）— {mean}"
+        num = f" · {card['roman']}" if card.get("roman") else ""
+        line = f"{marks[i]} {pos}：{card['name_cn']}{num}（{state}）— {mean}"
         if len(line) > 46:
             line = line[:46] + "…"
         _ink(d, (int(W * 0.05), ly), line, f_list, INK)
