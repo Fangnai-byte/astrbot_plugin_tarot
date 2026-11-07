@@ -289,25 +289,3 @@ def build_deck() -> list[dict]:
 
 DECK = build_deck()
 assert len(DECK) == 78, len(DECK)
-
-# ---------- 中式命名 ----------
-_CN_SUIT = {"权杖": "杖", "圣杯": "杯", "宝剑": "剑", "星币": "钱"}
-_CN_RANK = {"侍从": "童", "骑士": "骑", "王后": "妃", "皇后": "妃", "国王": "王"}
-
-
-def _localize(card: dict) -> dict:
-    suit = card.get("suit")
-    if not suit:
-        return card
-    old = card["name_cn"]
-    short_suit = _CN_SUIT[suit]
-    rank = old[len(suit):]
-    rank = _CN_RANK.get(rank, rank)
-    card["name_old"] = old
-    card["suit"] = short_suit
-    card["name_cn"] = short_suit + rank
-    return card
-
-
-for _c in DECK:
-    _localize(_c)
