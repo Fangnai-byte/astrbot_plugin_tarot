@@ -13,9 +13,9 @@
   },
   "card_art": {
     "type": "bool",
-    "description": "牌面画韦特牌图",
+    "description": "牌面使用韦特牌图",
     "default": false,
-    "hint": "关着是中式字面牌（朱框、竖排牌名、朱印）；打开换成韦特牌图。"
+    "hint": "关着是纯文字牌面。打开需要先在本机跑一次 tools_fetch_art.py 下载公版牌图，没有图时会自动退回文字牌面，不会报错。"
   },
   "font_style": {
     "type": "string",
