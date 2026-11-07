@@ -514,6 +514,11 @@ def _star4(d, cx: float, cy: float, r: float, color, inner: float = 0.34) -> Non
 _RANK_SHORT = {"侍从": "侍", "骑士": "骑", "皇后": "后", "国王": "王"}
 
 
+def _has_art(card: dict) -> bool:
+    """这张牌有没有图。没有图就别跟着转，字会倒过来。"""
+    return _art_image(card, 2, 2) is not None
+
+
 def _card_tag(card: dict) -> str:
     """左上角那个标记：大牌用罗马数字，小牌用点数或位阶。"""
     if card.get("roman"):
@@ -616,7 +621,7 @@ def render_cross(items: list, out_path: str, title: str,
         t.paste(panel, (0, 0), panel)
         if not _paint_face(t, card, rev, w, h, name_font, int(w * 0.070)):
             t.paste(_cn_face(card, rev, w, h), (0, 0))
-        if rev:
+        if rev and _has_art(card):
             t = t.rotate(180)
         return t
 
@@ -718,7 +723,7 @@ def render_celtic(items: list, out_path: str, title: str,
         t.paste(panel, (0, 0), panel)
         if not _paint_face(t, card, rev, w, h, f_cn, int(w * 0.075)):
             t.paste(_cn_face(card, rev, w, h), (0, 0))
-        if rev:
+        if rev and _has_art(card):
             t = t.rotate(180)
         if rotate:
             t = t.rotate(rotate, expand=True)
@@ -884,7 +889,7 @@ def render_spread(items: list, out_path: str, title: str,
         else:
             tile.paste(_cn_face(card, rev, card_w, card_h), (0, 0))
 
-        if rev and not single:
+        if rev and not single and _has_art(card):
             tile = tile.rotate(180)
         img.paste(tile, (x0, card_y), tile)
         d = ImageDraw.Draw(img, "RGBA")
