@@ -1,0 +1,5 @@
+__pycache__/
+*.py[cod]
+*.bak*
+# 卡片临时图走 AstrBot 的 temp 目录，正常不会落在这里；留一行防手滑
+*tarot_card*.png
