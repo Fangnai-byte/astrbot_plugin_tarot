@@ -3,3 +3,6 @@ __pycache__/
 *.bak*
 # 卡片临时图走 AstrBot 的 temp 目录，正常不会落在这里；留一行防手滑
 *tarot_card*.png
+
+# 牌图不随仓库分发，用 tools_fetch_art.py 自己下
+art/
