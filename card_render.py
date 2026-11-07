@@ -511,24 +511,9 @@ def _star4(d, cx: float, cy: float, r: float, color, inner: float = 0.34) -> Non
     d.polygon(pts, fill=color)
 
 
-_RANK_SHORT = {"侍从": "侍", "骑士": "骑", "皇后": "后", "国王": "王"}
-
-
-def _has_art(card: dict) -> bool:
-    """这张牌有没有图。没有图就别跟着转，字会倒过来。"""
-    return _art_image(card, 2, 2) is not None
-
-
 def _card_tag(card: dict) -> str:
-    """左上角那个标记：大牌用罗马数字，小牌用点数或位阶。"""
-    if card.get("roman"):
-        return card["roman"]
-    name = card.get("name_cn") or ""
-    suit = card.get("suit") or ""
-    rank = name[len(suit):] if suit and name.startswith(suit) else name
-    if not rank:
-        return suit
-    return _RANK_SHORT.get(rank, rank)
+    """左上角标记：只有大牌有罗马数字，小牌不重复写点数。"""
+    return card.get("roman") or ""
 
 
 def _cn_face(card: dict, rev: bool, w: int, h: int) -> Image.Image:
@@ -545,8 +530,9 @@ def _cn_face(card: dict, rev: bool, w: int, h: int) -> Image.Image:
     if small:
         f_tag = _font(int(w * 0.10), "num")
         f_name = _font(int(w * 0.125), "kai_small")
-        _center_at(d, str(tag), f_tag, w / 2, int(h * 0.12), BRASS)
-        _center_at(d, name, f_name, w / 2, int(h * 0.46), INK, soak=True)
+        if tag:
+            _center_at(d, str(tag), f_tag, w / 2, int(h * 0.12), BRASS)
+        _center_at(d, name, f_name, w / 2, int(h * (0.46 if tag else 0.40)), INK, soak=True)
         _orientation(d, w / 2, int(h * 0.74), rev, int(w * 0.075))
         return tile
 
@@ -555,8 +541,9 @@ def _cn_face(card: dict, rev: bool, w: int, h: int) -> Image.Image:
     f_en = _font(int(w * 0.038), "song")
     f_kw = _font(int(w * 0.043), "song")
 
-    _center_at(d, str(tag), f_tag, w / 2, int(h * 0.18), BRASS)
-    _rule(d, w / 2, int(h * 0.33), int(w * 0.22))
+    if tag:
+        _center_at(d, str(tag), f_tag, w / 2, int(h * 0.18), BRASS)
+    _rule(d, w / 2, int(h * (0.33 if tag else 0.26)), int(w * 0.22))
     _center_at(d, name, f_name, w / 2, int(h * 0.40), INK, soak=True)
     _center_at(d, (card.get("name_en") or "").upper(), f_en, w / 2, int(h * 0.56), INK_FAINT)
     _orientation(d, w / 2, int(h * 0.64), rev, int(w * 0.048))
@@ -621,7 +608,7 @@ def render_cross(items: list, out_path: str, title: str,
         t.paste(panel, (0, 0), panel)
         if not _paint_face(t, card, rev, w, h, name_font, int(w * 0.070)):
             t.paste(_cn_face(card, rev, w, h), (0, 0))
-        if rev and _has_art(card):
+        if rev:
             t = t.rotate(180)
         return t
 
@@ -649,14 +636,13 @@ def render_cross(items: list, out_path: str, title: str,
     d = ImageDraw.Draw(img, "RGBA")
     ly = H - list_h - int(W * 0.060)
     marks = "①②③④⑤⑥"
+    parts = []
     for i, (card, rev, pos, mean) in enumerate(items):
         state = "逆" if rev else "正"
-        num = f" · {card['roman']}" if card.get("roman") else ""
-        line = f"{marks[i]} {pos}：{card['name_cn']}{num}（{state}）— {mean}"
-        if len(line) > 42:
-            line = line[:42] + "…"
-        _ink(d, (int(W * 0.06), ly), line, f_list, INK)
-        ly += int(W * 0.036)
+        parts.append(f"{marks[i]}{card['name_cn']}{state}")
+    line = "  ".join(parts)
+    _ink(d, (int(W * 0.06), ly), line, f_list, INK)
+    ly += int(W * 0.040)
 
     if question:
         q = "问：" + (question if len(question) <= 26 else question[:26] + "…")
@@ -723,7 +709,7 @@ def render_celtic(items: list, out_path: str, title: str,
         t.paste(panel, (0, 0), panel)
         if not _paint_face(t, card, rev, w, h, f_cn, int(w * 0.075)):
             t.paste(_cn_face(card, rev, w, h), (0, 0))
-        if rev and _has_art(card):
+        if rev:
             t = t.rotate(180)
         if rotate:
             t = t.rotate(rotate, expand=True)
@@ -777,14 +763,13 @@ def render_celtic(items: list, out_path: str, title: str,
     # 牌义列表
     ly = H - list_h - int(W * 0.050)
     marks = "①②③④⑤⑥⑦⑧⑨⑩"
+    parts = []
     for i, (card, rev, pos, mean) in enumerate(items):
         state = "逆" if rev else "正"
-        num = f" · {card['roman']}" if card.get("roman") else ""
-        line = f"{marks[i]} {pos}：{card['name_cn']}{num}（{state}）— {mean}"
-        if len(line) > 46:
-            line = line[:46] + "…"
-        _ink(d, (int(W * 0.05), ly), line, f_list, INK)
-        ly += int(W * 0.030)
+        parts.append(f"{marks[i]}{card['name_cn']}{state}")
+    line = "  ".join(parts)
+    _ink(d, (int(W * 0.06), ly), line, f_list, INK)
+    ly += int(W * 0.040)
 
     if question:
         q = "问：" + (question if len(question) <= 26 else question[:26] + "…")
@@ -889,7 +874,7 @@ def render_spread(items: list, out_path: str, title: str,
         else:
             tile.paste(_cn_face(card, rev, card_w, card_h), (0, 0))
 
-        if rev and not single and _has_art(card):
+        if rev and not single:
             tile = tile.rotate(180)
         img.paste(tile, (x0, card_y), tile)
         d = ImageDraw.Draw(img, "RGBA")
