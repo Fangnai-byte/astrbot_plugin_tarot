@@ -891,9 +891,9 @@ class TarotPlugin(Star):
         async for item in self.cmd_tarot(event):
             yield item
 
-    @filter.regex(r"(抽|占|算|起|看|来|帮|给|洗)[^，。！？]{0,4}(牌|卦)")
+    @filter.regex(r"(抽|占|算|起|看|来|帮|给|洗)[^，。！？]{0,4}(牌|塔罗)")
     async def cmd_tarot_loose(self, event: AstrMessageEvent):
-        """没写「塔罗」也能抽：「抽个牌」「帮我算一卦」。
+        """没写「塔罗」也能抽：「抽个牌」「来一发塔罗」。卦留给六爻，这里不接。
 
         只认 At 或唤醒之后的话。命令词开头的让路，免得同一条走两遍。
         """
@@ -903,7 +903,7 @@ class TarotPlugin(Star):
         if raw.lower().startswith(("塔罗", "tarot", "抽牌", "抽塔罗")):
             return
         question = re.sub(r"^(帮我|给我|麻烦|能不能|可以)?\s*"
-                          r"(抽|占|算|起|看|来|给|帮|洗)[^，。！？]{0,4}(牌|卦)[，。！？\s]*",
+                          r"(抽|占|算|起|看|来|给|帮|洗)[^，。！？]{0,4}(牌|塔罗)[，。！？\s]*",
                           "", raw)
         if len(question) > 40:
             question = ""
