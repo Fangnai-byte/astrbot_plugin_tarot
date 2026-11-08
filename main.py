@@ -523,6 +523,7 @@ class TarotPlugin(Star):
             "raw": question[:40],
             "spread": spread_name,
             "first": first,
+            "gid": str(event.get_group_id() or ""),
             "cards": [{"n": c["name_cn"], "r": bool(r)} for c, r, _p, _m in items],
         })
 
@@ -625,6 +626,10 @@ class TarotPlugin(Star):
                 lines.append(f"· {info['name']}（{key}，{len(info['positions'])} 张）：{info['desc']}")
             lines.append("\n用法，/塔罗 十字 要不要换工作")
             yield event.plain_result("\n".join(lines))
+            return
+
+        if sub in ("群统计", "本群统计", "groupstats"):
+            yield event.plain_result(self._group_stats_text(event))
             return
 
         if sub in ("统计", "stats", "记录"):
@@ -886,6 +891,34 @@ class TarotPlugin(Star):
         async for item in self.cmd_tarot(event):
             yield item
 
+    @filter.regex(r"(抽|占|算|起|看|来|帮|给|洗)[^，。！？]{0,4}(牌|卦)")
+    async def cmd_tarot_loose(self, event: AstrMessageEvent):
+        """没写「塔罗」也能抽：「抽个牌」「帮我算一卦」。
+
+        只认 At 或唤醒之后的话。命令词开头的让路，免得同一条走两遍。
+        """
+        if not getattr(event, "is_at_or_wake_command", False):
+            return
+        raw = str(getattr(event, "message_str", "") or "").strip().lstrip("/").strip()
+        if raw.lower().startswith(("塔罗", "tarot", "抽牌", "抽塔罗")):
+            return
+        question = re.sub(r"^(帮我|给我|麻烦|能不能|可以)?\s*"
+                          r"(抽|占|算|起|看|来|给|帮|洗)[^，。！？]{0,4}(牌|卦)[，。！？\s]*",
+                          "", raw)
+        if len(question) > 40:
+            question = ""
+        original = str(getattr(event, "message_str", "") or "")
+        try:
+            # 借命令那条路：把消息改写成「塔罗 问题」，跑完还原
+            event.message_str = ("塔罗 " + question).strip()
+            async for item in self.cmd_tarot(event):
+                yield item
+        finally:
+            try:
+                event.message_str = original
+            except Exception:
+                pass
+
     def _repeat_cards_note(self, event: AstrMessageEvent, items: list,
                            window: int = 5) -> str:
         """最近几局反复出现的牌。返回一句提示，没有就空串。"""
@@ -953,6 +986,47 @@ class TarotPlugin(Star):
         if total_cards:
             lines.append(f"逆位 {reversed_count} 张，占 {reversed_count / total_cards:.0%}。")
         lines.append("\n统计的是最近这些局，最多留 60 局。")
+        return "\n".join(lines)
+
+    def _group_stats_text(self, event: AstrMessageEvent) -> str:
+        """整个群加起来的数：几局、几个人、谁抽得多、牌面偏什么。"""
+        gid = str(event.get_group_id() or "")
+        if not gid:
+            return "群统计得在群里用。"
+
+        data = load_history()
+        rows = []
+        people: dict[str, int] = {}
+        for uid, entries in data.items():
+            if not isinstance(entries, list):
+                continue
+            for row in entries:
+                if not isinstance(row, dict) or not row.get("cards"):
+                    continue
+                if str(row.get("gid") or "") != gid:
+                    continue
+                rows.append(row)
+                people[str(row.get("uid") or uid)] = people.get(str(row.get("uid") or uid), 0) + 1
+        if not rows:
+            return "这个群还没人抽过。"
+
+        total_cards = sum(len(r["cards"]) for r in rows)
+        rev = sum(1 for r in rows for c in r["cards"] if c.get("r"))
+        names: dict[str, int] = {}
+        for r in rows:
+            for c in r["cards"]:
+                n = str(c.get("n", ""))
+                names[n] = names.get(n, 0) + 1
+
+        lines = [f"本群一共抽了 {len(rows)} 局，{total_cards} 张牌，{len(people)} 个人抽过。"]
+        top_people = sorted(people.items(), key=lambda kv: -kv[1])[:3]
+        if top_people:
+            lines.append("抽得最多：" + "、".join(f"××{uid[-4:]} {n} 局" for uid, n in top_people))
+        top_cards = sorted(names.items(), key=lambda kv: (-kv[1], kv[0]))[:3]
+        if top_cards:
+            lines.append("出得最多：" + "、".join(f"{k} ×{v}" for k, v in top_cards))
+        if total_cards:
+            lines.append(f"逆位 {rev} 张，占 {rev / total_cards:.0%}。")
         return "\n".join(lines)
 
     def _repeat_hint(self, event: AstrMessageEvent, question: str) -> str:
